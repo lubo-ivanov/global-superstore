@@ -4,8 +4,10 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.UUID;
 
 public class Item {
+    private String id;
     private String category;
     private String name;
     private Double price;
@@ -14,6 +16,15 @@ public class Item {
     private Date date;
 
     public Item() {
+        this.id = UUID.randomUUID().toString();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getCategory() {
