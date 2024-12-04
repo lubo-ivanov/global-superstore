@@ -6,10 +6,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import static com.ltp.globalsuperstore.Constants.CATEGORIES;
 
@@ -45,9 +48,22 @@ public class StoreController {
     }
 
     @PostMapping("/submitItem")
-    public String handleSubmit(Item item) {
-        items.add(item);
+    public String handleSubmit(Item item, RedirectAttributes redirectAttributes) {
+        int index = items.indexOf(getItem(item.getId()));
+        String status = "success";
+        if (index < 0) {
+            items.add(item);
+        } else if (within5Days(item.getDate(), items.get(index).getDate())){
+            items.set(index, item);
+        } else {
+            status = "failed";
+        }
+        redirectAttributes.addFlashAttribute("status", status);
         return "redirect:/inventory";
     }
 
+    public boolean within5Days(Date newDate, Date oldDate) {
+        long diff = newDate.getTime() - oldDate.getTime();
+        return (int) (TimeUnit.MILLISECONDS.toDays(diff)) <= 5;
+    }
 }
